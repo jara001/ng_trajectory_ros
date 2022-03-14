@@ -7,6 +7,7 @@
 ######################
 
 from autopsy.node import Node
+from autopsy.reconfigure import ParameterServer
 
 
 ######################
@@ -14,6 +15,17 @@ from autopsy.node import Node
 ######################
 
 class RunNode(Node):
+
+    # Node variables
+    P = ParameterServer()
+
+    # Parameters
+    # Note: Not sure whether this is the right way, but when
+    #       we have this option... :)
+    P.config_file = {"default": "",
+        "description": "Path to the configuration file."
+    }
+
 
     def __init__(self):
         super(Node, self).__init__("ng_trajectory_ros")

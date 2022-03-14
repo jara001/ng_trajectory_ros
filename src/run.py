@@ -13,6 +13,13 @@ def main():
 
     node = RunNode()
 
+    # Update parameters
+    if rospy.has_param("~"):
+        node.P.update(rospy.get_param("~"))
+
+    node.P.reconfigure()
+
+
     # Function spin() simply keeps python from exiting until this node is stopped.
     rospy.spin()
 
