@@ -20,6 +20,10 @@ def main():
     node.P.reconfigure()
 
 
+    # Load configuration
+    node.load_config()
+
+
     # Function spin() simply keeps python from exiting until this node is stopped.
     rospy.spin()
 
