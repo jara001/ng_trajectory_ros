@@ -25,6 +25,11 @@
   <exec_depend condition="$ROS_VERSION == 2">rclpy</exec_depend>
 
   <exec_depend version_gte="0.4.0">autopsy</exec_depend>
+  <exec_depend>ng_trajectory</exec_depend>
+  <exec_depend>python-numpy</exec_depend>
+
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
 
   <!-- Any other parameters can be stored here. -->
   <export>
