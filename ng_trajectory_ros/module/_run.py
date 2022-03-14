@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # _run.py
 """Run node for trajectory optimization using ng_trajectory.
 """
