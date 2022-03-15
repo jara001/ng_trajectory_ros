@@ -34,14 +34,7 @@ class RunNode(Node):
     # Node variables
     start_points = None
     valid_points = None
-    P = ParameterServer()
-
-    # Parameters
-    # Note: Not sure whether this is the right way, but when
-    #       we have this option... :)
-    P.config_file = {"default": "",
-        "description": "Path to the configuration file."
-    }
+    P = None
 
 
     def __init__(self):
@@ -52,7 +45,16 @@ class RunNode(Node):
 
         self.pub_path = self.Publisher("npath", Path, queue_size = 1, latch = True)
 
-        self.P.config_file.callback = self.reconf_config_file
+
+        # Parameters
+        self.P = ParameterServer()
+
+        # Note: Not sure whether this is the right way, but when
+        #       we have this option... :)
+        self.P.config_file = {"default": "",
+            "description": "Path to the configuration file.",
+            "callback": self.reconf_config_file
+        }
 
 
     # Callbacks
