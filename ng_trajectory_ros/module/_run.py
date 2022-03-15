@@ -52,6 +52,8 @@ class RunNode(Node):
 
         self.pub_path = self.Publisher("npath", Path, queue_size = 1, latch = True)
 
+        self.P.config_file.callback = self.reconf_config_file
+
 
     # Callbacks
     def callback_path(self, msg):
@@ -86,6 +88,20 @@ class RunNode(Node):
 
         if self.start_points is not None:
             self.start_optimization(msg.header)
+
+
+    # Reconfigure callbacks
+    def reconf_config_file(self, new_value):
+        """Callback on changing the value of the config file."""
+
+        self.P.config_file = new_value
+
+        try:
+            self.load_config()
+        except Exception as e:
+            print (e)
+
+        return new_value
 
 
     # Optimization

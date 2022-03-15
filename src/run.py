@@ -21,7 +21,10 @@ def main():
 
 
     # Load configuration
-    node.load_config()
+    try:
+        node.load_config()
+    except Exception as e:
+        print (e)
 
 
     # Function spin() simply keeps python from exiting until this node is stopped.
