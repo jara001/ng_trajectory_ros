@@ -13,7 +13,7 @@ from autopsy.reconfigure import ParameterServer
 import os
 
 import numpy
-import ng_trajectory
+#import ng_trajectory
 
 
 # Messages
@@ -112,7 +112,8 @@ class RunNode(Node):
 
         if os.path.isfile(self.P.config_file.value):
             if os.access(self.P.config_file.value, os.R_OK):
-                ng_trajectory.configurationLoad(self.P.config_file.value)
+                #ng_trajectory.configurationLoad(self.P.config_file.value)
+                print ("Not trying to load the configuration.")
             else:
                 raise IOError("File '%s' is not readable." % self.P.config_file.value)
         else:
@@ -126,7 +127,7 @@ class RunNode(Node):
         header -- Header class from the messages
         """
 
-        fitness, rcandidate, tcandidate, result = ng_trajectory.execute(self.start_points, self.valid_points)
+        fitness, rcandidate, tcandidate, result = (0, 0, 0, 0) #ng_trajectory.execute(self.start_points, self.valid_points)
 
         self.pub_path.publish(
             Path(
