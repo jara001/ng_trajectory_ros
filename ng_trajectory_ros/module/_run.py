@@ -12,6 +12,7 @@ from autopsy.reconfigure import ParameterServer
 # For reading the configuration
 import os
 
+import math
 import numpy
 import ng_trajectory
 
@@ -23,6 +24,22 @@ from geometry_msgs.msg import Point
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseStamped
+from plan_msgs.msg import Trajectory
+
+
+######################
+# Utilities
+######################
+
+def euler_to_quaternion(roll, pitch, yaw):
+    """Taken from 'profile_trajectory2'."""
+
+    qx = numpy.sin(roll/2) * numpy.cos(pitch/2) * numpy.cos(yaw/2) - numpy.cos(roll/2) * numpy.sin(pitch/2) * numpy.sin(yaw/2)
+    qy = numpy.cos(roll/2) * numpy.sin(pitch/2) * numpy.cos(yaw/2) + numpy.sin(roll/2) * numpy.cos(pitch/2) * numpy.sin(yaw/2)
+    qz = numpy.cos(roll/2) * numpy.cos(pitch/2) * numpy.sin(yaw/2) - numpy.sin(roll/2) * numpy.sin(pitch/2) * numpy.cos(yaw/2)
+    qw = numpy.cos(roll/2) * numpy.cos(pitch/2) * numpy.cos(yaw/2) + numpy.sin(roll/2) * numpy.sin(pitch/2) * numpy.sin(yaw/2)
+
+    return [qx, qy, qz, qw]
 
 
 ######################
@@ -46,6 +63,7 @@ class RunNode(Node):
         self.sub_validarea = self.Subscriber("validarea", GridCells, self.callback_validarea)
 
         self.pub_path = self.Publisher("npath", Path, queue_size = 1, latch = True)
+        self.pub_traj = self.Publisher("trajectory", Trajectory, queue_size = 1, latch = True)
 
 
         # Parameters
@@ -133,6 +151,20 @@ class RunNode(Node):
 
         fitness, rcandidate, tcandidate, result = ng_trajectory.execute(self.start_points, self.valid_points)
 
+        # Trajectory -- currently profile only
+        _criterion = ng_trajectory.criterions.__getattribute__("profile")
+
+        # Rebuild the configuration
+        _alg = {**ng_trajectory.main.CONFIGURATION}
+
+        for level in _alg.get("cascade", [{}]):
+            _alg = {**_alg, **level}
+
+        _criterion.init(**{**_alg, **_alg.get("criterion_init", {})})
+        _v, _a, _t = _criterion.profiler.profileCompute(points = result, overlap = {**_alg, **_alg.get("criterion_args", {})}.get("overlap", 0))
+
+
+        # Publish path
         self.pub_path.publish(
             Path(
                 header = self.header,
@@ -151,3 +183,44 @@ class RunNode(Node):
                 ],
             )
         )
+
+        # Publish trajectory
+        # Taken from 'profile_trajectory2'
+        msg = Trajectory()
+        msg.header = self.header
+
+        # Poses
+        msg.poses = []
+        # Taken from 'car_trajectory_generator.py' by David Kopecky
+        for i, p in enumerate(result):
+            if i < len(result) - 1:
+                dx = result[i + 1, 0] - p[0]
+                dy = result[i + 1, 1] - p[1]
+            else:
+                dx = result[1, 0] - p[0]
+                dy = result[1, 1] - p[1]
+
+            # print("dx {} dy {}".format(dx, dy))
+            angle = math.atan2(dy, dx)
+            q = euler_to_quaternion(0, 0, angle)
+
+            ps = Pose()
+            ps.position.x = p[0]
+            ps.position.y = p[1]
+
+            ps.orientation.z = q[2]
+            ps.orientation.w = q[3]
+            msg.poses.append(ps)
+
+        # Curvature
+        msg.curvatures = result[:, -1]
+
+        # Velocity
+        msg.velocities = _v
+
+        # Acceleration
+        msg.accelerations = _a
+
+        self.pub_traj.publish(msg)
+
+        #rospy.loginfo("Profile trajectory finished with predicted lap time %ss." % ("%f" % _t[-1]).rstrip("0").rstrip("."))
