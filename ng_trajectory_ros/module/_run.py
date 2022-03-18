@@ -35,6 +35,8 @@ class RunNode(Node):
     start_points = None
     valid_points = None
     P = None
+    header = None
+    configuration_loaded = None
 
 
     def __init__(self):
@@ -72,7 +74,7 @@ class RunNode(Node):
         print ("Racingline received.")
 
         if self.valid_points is not None:
-            self.start_optimization(msg.header)
+            self.start_optimization()
 
 
     def callback_validarea(self, msg):
@@ -89,7 +91,7 @@ class RunNode(Node):
         print ("Valid points received.")
 
         if self.start_points is not None:
-            self.start_optimization(msg.header)
+            self.start_optimization()
 
 
     # Reconfigure callbacks
@@ -113,24 +115,27 @@ class RunNode(Node):
         if os.path.isfile(self.P.config_file.value):
             if os.access(self.P.config_file.value, os.R_OK):
                 ng_trajectory.configurationLoad(self.P.config_file.value)
+                self.configuration_loaded = True
+
+                if self.start_points is not None and self.valid_points is not None:
+                    self.start_optimization()
             else:
                 raise IOError("File '%s' is not readable." % self.P.config_file.value)
         else:
             raise IOError("File '%s' does not exist." % self.P.config_file.value)
 
 
-    def start_optimization(self, header):
-        """Start the optimization and publish its results.
+    def start_optimization(self):
+        """Start the optimization and publish its results."""
 
-        Arguments:
-        header -- Header class from the messages
-        """
+        if not self.configuration_loaded:
+            return
 
         fitness, rcandidate, tcandidate, result = ng_trajectory.execute(self.start_points, self.valid_points)
 
         self.pub_path.publish(
             Path(
-                header = header,
+                header = self.header,
                 poses = [
                     PoseStamped(
                         pose = Pose(
