@@ -89,6 +89,8 @@ class RunNode(Node):
 
         self.start_points = numpy.asarray([ [_p.pose.position.x, _p.pose.position.y ] for _p in msg.poses ])
 
+        self.header = msg.header
+
         print ("Racingline received.")
 
         if self.valid_points is not None:
@@ -105,6 +107,8 @@ class RunNode(Node):
         """
 
         self.valid_points = numpy.asarray([ [_p.x, _p.y ] for _p in msg.cells ])
+
+        self.header = msg.header
 
         print ("Valid points received.")
 
