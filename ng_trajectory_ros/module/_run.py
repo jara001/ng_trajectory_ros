@@ -80,6 +80,7 @@ class RunNode(Node):
 
         self.pub_path = self.Publisher("npath", Path, queue_size = 1, latch = True)
         self.pub_traj = self.Publisher("trajectory", TrajectoryP, queue_size = 1, latch = True)
+        self.pub_traj_autoware = self.Publisher("trajectory/autoware", TrajectoryA, queue_size = 1, latch = True)
 
 
         # Parameters
@@ -153,13 +154,13 @@ class RunNode(Node):
 
     def reconf_use_autoware(self, new_value):
         """Callback on changing the message type for Trajectory."""
-        print("Reconf", new_value)
-        self.pub_traj.unregister()
+        #print("Reconf", new_value)
+        #self.pub_traj.unregister()
 
-        if new_value:
-            self.pub_traj = self.Publisher("trajectory", TrajectoryA, queue_size = 1, latch = True)
-        else:
-            self.pub_traj = self.Publisher("trajectory", TrajectoryP, queue_size = 1, latch = True)
+        #if new_value:
+        #    self.pub_traj = self.Publisher("trajectory", TrajectoryA, queue_size = 1, latch = True)
+        #else:
+        #    self.pub_traj = self.Publisher("trajectory", TrajectoryP, queue_size = 1, latch = True)
 
         self.publish_trajectory(new_value)
 
@@ -170,7 +171,7 @@ class RunNode(Node):
         """Publish the trajectory."""
 
         _autoware = use_autoware if use_autoware is not None else self.P.use_autoware.value
-        print("Pub:", _autoware)
+        #print("Pub:", _autoware)
         if _autoware:
             if self._t is not None:
                 self.publish_trajectory_autoware()
@@ -436,4 +437,4 @@ class RunNode(Node):
 
             msg2.points.append(_tp)
 
-        self.pub_traj.publish(msg2)
+        self.pub_traj_autoware.publish(msg2)
