@@ -4,7 +4,7 @@
   schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>ng_trajectory_ros</name>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <description>
     ROS wrapper for ng_trajectory.
   </description>

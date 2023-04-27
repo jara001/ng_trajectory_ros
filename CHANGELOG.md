@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## Unreleased
+## 0.2.0 - 2023-04-27
 ### Added
 - Automatically load configuration when the parameter value changes.
 - ROS1 entrypoint is run from shell to ensure correct Python version.
