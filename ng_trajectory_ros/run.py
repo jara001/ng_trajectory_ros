@@ -7,7 +7,6 @@ import rclpy
 import sys
 
 from ng_trajectory_ros.module._run import RunNode
-from rcl_interfaces.msg import SetParametersResult
 
 
 def main(args = None):
