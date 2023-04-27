@@ -1,0 +1,57 @@
+{
+    "_version": 2,
+    "_comment": "Example of configuration file for ng_trajectory.",
+    "loops": 1,
+    "groups": 20,
+    "interpolator": "cubic_spline",
+    "segmentator": "flood_fill",
+    "selector": "uniform_time",
+    "selector_init": {
+        "distance": 0.05,
+        "sampling_distance": 1.0,
+        "overlap": 100
+    },
+    "penalizer" : "curvature",
+    "penalizer_args": {
+        "k_max": 1.6
+    },
+    "cascade": [
+        {
+            "algorithm": "matryoshka",
+            "budget": 100,
+            "layers": 5,
+            "criterion": "profile",
+            "criterion_init": {
+                "a_acc_max": 6.8,
+                "a_break_max": 10.0,
+                "v_lim": 6.5,
+                "_mu": 0.35
+            },
+            "criterion_args": {
+                "overlap": 100
+            }
+        }
+    ],
+    "start_points": "start_points.npy",
+    "valid_points": "valid_points.npy",
+    "logging_verbosity": 2,
+    "hold_map": true,
+    "plot": true,
+    "plot_args": [
+        {
+            "_figure": {
+                "function": "axis",
+                "_args": [ "equal" ]
+            },
+            "trackPlot": [ "@track" ]
+        },
+        {
+            "pointsPlot": {
+                "_args": [ "@result" ]
+            },
+            "pointsScatter": {
+                "_args": [ "@rcandidate" ]
+            }
+        }
+    ]
+}

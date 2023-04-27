@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Parameter `~use_autoware` to publish the Trajectory in `autoware_auto_msgs/Trajectory` format.
 - `autoware_auto_msgs` dependency.
 - Parameter `~use_internal_points` to use points defined in the configuration file instead of ROS messages.
+- Example configuration file.
 
 ### Changed
 - ROS2 entrypoint is enabled.
