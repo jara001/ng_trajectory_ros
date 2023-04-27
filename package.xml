@@ -4,7 +4,7 @@
   schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>ng_trajectory_ros</name>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <description>
     ROS wrapper for ng_trajectory.
   </description>
@@ -24,12 +24,16 @@
   <exec_depend condition="$ROS_VERSION == 1">rospy</exec_depend>
   <exec_depend condition="$ROS_VERSION == 2">rclpy</exec_depend>
 
-  <exec_depend version_gte="0.4.0">autopsy</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1" version_gte="0.4.0">autopsy</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2" version_gte="0.7.0">autopsy</exec_depend>
   <exec_depend>ng_trajectory</exec_depend>
   <exec_depend>python-numpy</exec_depend>
 
+  <exec_depend>std_msgs</exec_depend>
   <exec_depend>nav_msgs</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>plan_msgs</exec_depend>
+  <exec_depend>autoware_auto_msgs</exec_depend>
 
   <!-- Any other parameters can be stored here. -->
   <export>

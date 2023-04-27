@@ -12,8 +12,8 @@ from ng_trajectory_ros.module._run import RunNode
 def main(args = None):
     """Starts a ROS node, registers the callbacks."""
 
-    print ("CURRENTLY, THIS NODE IS NOT SUPPORTED BY ROS2.")
-    return
+    #print ("CURRENTLY, THIS NODE IS NOT SUPPORTED BY ROS2.")
+    #return
 
     if args is None:
         args = sys.argv
@@ -21,6 +21,8 @@ def main(args = None):
     rclpy.init(args = args)
 
     node = RunNode()
+
+    node.P.reconfigure(node = node)
 
     rclpy.spin(node)
 
