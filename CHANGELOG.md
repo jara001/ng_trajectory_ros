@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - ROS1 entrypoint is run from shell to ensure correct Python version.
 - Parameter `~use_autoware` to publish the Trajectory in `autoware_auto_msgs/Trajectory` format.
 - `autoware_auto_msgs` dependency.
+- Parameter `~use_internal_points` to use points defined in the configuration file instead of ROS messages.
 
 ### Changed
 - ROS2 entrypoint is enabled.

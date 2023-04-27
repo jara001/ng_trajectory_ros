@@ -18,6 +18,7 @@ import ng_trajectory
 
 
 # Messages
+from std_msgs.msg import Header
 from nav_msgs.msg import Path
 from nav_msgs.msg import GridCells
 from geometry_msgs.msg import Point
@@ -59,7 +60,7 @@ class RunNode(Node):
     start_points = None
     valid_points = None
     P = None
-    header = None
+    header = Header()
     configuration_loaded = None
 
     # Result
@@ -97,6 +98,11 @@ class RunNode(Node):
         self.P.use_autoware = {"default": False,
             "description": "When True, trajectory is published as 'autoware_auto_msgs/Trajectory'.",
             "callback": self.reconf_use_autoware
+        }
+
+        self.P.use_internal_points = {"default": False,
+            "description": "When True, data from the configuration file are used instead of ROS messages.",
+            "callback": self.reconf_use_internal_points
         }
 
         self.P.config_file = {"default": "",
@@ -158,6 +164,18 @@ class RunNode(Node):
         return new_value
 
 
+    def reconf_use_internal_points(self, new_value):
+        """Callback on changing the value of the parameter 'use_internal_points'."""
+
+        self.P.use_internal_points = new_value
+
+        if self.configuration_loaded:
+            if (self.start_points is not None and self.valid_points is not None) or self.P.use_internal_points:
+                self.start_optimization()
+
+        return new_value
+
+
     def reconf_use_autoware(self, new_value):
         """Callback on changing the message type for Trajectory."""
         #print("Reconf", new_value)
@@ -195,7 +213,7 @@ class RunNode(Node):
                 ng_trajectory.configurationLoad(self.P.config_file.value)
                 self.configuration_loaded = True
 
-                if self.start_points is not None and self.valid_points is not None:
+                if (self.start_points is not None and self.valid_points is not None) or self.P.use_internal_points:
                     self.start_optimization()
             else:
                 raise IOError("File '%s' is not readable." % self.P.config_file.value)
@@ -211,7 +229,11 @@ class RunNode(Node):
 
         self._t = None
 
-        self.fitness, self.rcandidate, self.tcandidate, self.result = ng_trajectory.execute(self.start_points, self.valid_points)
+
+        if self.P.use_internal_points:
+            self.fitness, self.rcandidate, self.tcandidate, self.result = ng_trajectory.execute()
+        else:
+            self.fitness, self.rcandidate, self.tcandidate, self.result = ng_trajectory.execute(self.start_points, self.valid_points)
 
         # Trajectory -- currently profile only
         _criterion = ng_trajectory.criterions.__getattribute__("profile")
