@@ -88,14 +88,20 @@ class RunNode(Node):
 
         # Note: Not sure whether this is the right way, but when
         #       we have this option... :)
-        self.P.config_file = {"default": "",
-            "description": "Path to the configuration file.",
-            "callback": self.reconf_config_file
-        }
 
+        # Autopsy == 0.7 calls the callbacks when using reconfigure().
+        # This is required, as otherwise the callbacks would not be called when setting the first value from params (in opposition to ROS1).
+        # Maybe it is an issue of autopsy-ROS2 relation, but who knows.
+
+        # So we reverse the order so the trajectory is published only once.
         self.P.use_autoware = {"default": False,
             "description": "When True, trajectory is published as 'autoware_auto_msgs/Trajectory'.",
             "callback": self.reconf_use_autoware
+        }
+
+        self.P.config_file = {"default": "",
+            "description": "Path to the configuration file.",
+            "callback": self.reconf_config_file
         }
 
 
