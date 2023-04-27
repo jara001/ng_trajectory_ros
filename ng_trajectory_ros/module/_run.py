@@ -234,10 +234,10 @@ class RunNode(Node):
                     PoseStamped(
                         pose = Pose(
                             position = Point(
-                                point[0], point[1], 0
+                                x = point[0], y = point[1], z = 0.0
                             ),
                             orientation = Quaternion(
-                                0, 0, 0, 1
+                                x = 0.0, y = 0.0, z = 0.0, w = 1.0
                             ),
                         )
                     )
@@ -284,13 +284,13 @@ class RunNode(Node):
             msg.poses.append(ps)
 
         # Curvature
-        msg.curvatures = self.result[:, -1]
+        msg.curvatures = self.result[:, -1].ravel().tolist()#tolist()
 
         # Velocity
-        msg.velocities = self._v
+        msg.velocities = self._v.ravel().tolist()#T.tolist()[0]
 
         # Acceleration
-        msg.accelerations = self._a
+        msg.accelerations = self._a.ravel().tolist()#T.tolist()[0]
 
         self.pub_traj.publish(msg)
 
@@ -335,8 +335,12 @@ class RunNode(Node):
         for _i in range(len(poses)):
             _tp = TrajectoryPoint()
 
-            _tp.time_from_start.secs = int(self._t[_i])
-            _tp.time_from_start.nsecs = int((self._t[_i] - int(self._t[_i])) * 1e9)
+            try:
+                _tp.time_from_start.secs = int(self._t[_i])
+                _tp.time_from_start.nsecs = int((self._t[_i] - int(self._t[_i])) * 1e9)
+            except:
+                _tp.time_from_start.sec = int(self._t[_i])
+                _tp.time_from_start.nanosec = int((self._t[_i] - int(self._t[_i])) * 1e9)
 
             _tp.pose = poses[_i]
 
@@ -431,15 +435,15 @@ class RunNode(Node):
             _delta = math.atan(_L * _kappa)
             _beta = math.atan(_lr * _kappa)
 
-            _tp.longitudinal_velocity_mps = self._v[_i] * math.cos(_beta)
-            _tp.lateral_velocity_mps = self._v[_i] * math.sin(_beta)
+            _tp.longitudinal_velocity_mps = float(self._v[_i] * math.cos(_beta))
+            _tp.lateral_velocity_mps = float(self._v[_i] * math.sin(_beta))
 
-            _tp.acceleration_mps2 = self._a[_i]
+            _tp.acceleration_mps2 = float(self._a[_i])
 
-            _tp.heading_rate_rps = _tp.longitudinal_velocity_mps * _kappa
+            _tp.heading_rate_rps = float(_tp.longitudinal_velocity_mps * _kappa)
 
-            _tp.front_wheel_angle_rad = _delta
-            _tp.rear_wheel_angle_rad = 0
+            _tp.front_wheel_angle_rad = float(_delta)
+            _tp.rear_wheel_angle_rad = 0.0
 
             msg2.points.append(_tp)
 
