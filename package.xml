@@ -26,8 +26,7 @@
 
   <exec_depend condition="$ROS_VERSION == 1" version_gte="0.4.0">autopsy</exec_depend>
   <exec_depend condition="$ROS_VERSION == 2" version_gte="0.7.0">autopsy</exec_depend>
-  <exec_depend>ng_trajectory</exec_depend>
-  <exec_depend>python-numpy</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
 
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>nav_msgs</exec_depend>
