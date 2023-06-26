@@ -235,8 +235,6 @@ class RunNode(Node):
         else:
             self.fitness, self.rcandidate, self.tcandidate, self.result = ng_trajectory.execute(self.start_points, self.valid_points)
 
-        # Trajectory -- currently profile only
-        _criterion = ng_trajectory.criterions.__getattribute__("profile")
 
         # Rebuild the configuration
         _alg = {**ng_trajectory.main.CONFIGURATION}
@@ -244,8 +242,16 @@ class RunNode(Node):
         for level in _alg.get("cascade", [{}]):
             _alg = {**_alg, **level}
 
+        # Trajectory -- currently profile only
+        _criterion = ng_trajectory.criterions.__getattribute__(_alg.get("criterion"))
+
         _criterion.init(**{**_alg, **_alg.get("criterion_init", {})})
-        self._v, self._a, self._t = _criterion.profiler.profileCompute(points = self.result, overlap = {**_alg, **_alg.get("criterion_args", {})}.get("overlap", 0))
+
+        try:
+            self._v, self._a, self._t = _criterion.profiler.profileCompute(points = self.result, overlap = {**_alg, **_alg.get("criterion_args", {})}.get("overlap", 0))
+        except:
+            _criterion.main.P.update("overlap", {**_alg, **_alg.get("criterion_args", {})}.get("overlap", 0))
+            self._v, self._a, self._t = _criterion.main.computeProfile(points = self.result)
 
 
         # Publish path
